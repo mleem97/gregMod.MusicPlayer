@@ -53,11 +53,18 @@ public static class MusicUI
             if (willShow) Rebuild();
             _chrome.Toggle();
             MelonLogger.Msg("[MusicPlayer] Panel " + (_chrome.IsVisible ? "gezeigt." : "versteckt."));
+            try { if (GregHost.HasCore) ReportOpenState(); } catch { /* best-effort */ }
         }
         catch (Exception ex)
         {
             MelonLogger.Error("[MusicPlayer] UI-Toggle fehlgeschlagen: " + ex.GetBaseException().Message);
         }
+    }
+
+    // Separate Methode (JIT-Trennung): meldet den Panel-Status ans F1-Hub.
+    private static void ReportOpenState()
+    {
+        try { gregCore.UI.GregMenuRegistry.SetOpen("musicplayer", IsVisible); } catch { /* best-effort */ }
     }
 
     public static void Refresh()

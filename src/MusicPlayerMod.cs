@@ -183,6 +183,8 @@ public class MusicPlayerMod : MelonMod
         {
             gregCore.UI.GregHudRegistry.Register("musicplayer", _toggleKey.ToString(), "Music");
             gregCore.UI.GregMenuRegistry.RegisterOpener("musicplayer", () => UI.MusicUI.Toggle());
+            gregCore.UI.GregMenuRegistry.RegisterCloser("musicplayer",
+                () => { try { if (UI.MusicUI.IsVisible) UI.MusicUI.Toggle(); } catch { /* best-effort */ } });
         }
         catch (Exception ex)
         {
