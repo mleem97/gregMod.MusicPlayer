@@ -3,8 +3,8 @@ using MelonLoader;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Duenne Fassade ueber AudioBackend (Core/Standalone-Dispatch).
-// Diese Datei beruehrt KEINE gregCore-Typen (JIT-sicher ohne DLL).
+// Thin facade over AudioBackend (core/standalone dispatch).
+// This file touches NO gregCore types (JIT-safe without DLL).
 public static class MusicController
 {
     public static string CurrentTitle => AudioBackend.CurrentTitle;
@@ -15,7 +15,7 @@ public static class MusicController
         if (track == null) return;
         try
         {
-            MelonLogger.Msg("[MusicPlayer] Lade: '" + track.Title + "'");
+            MelonLogger.Msg("[MusicPlayer] Loading: '" + track.Title + "'");
             AudioBackend.PlayTrack(track, volume);
         }
         catch (Exception ex)
@@ -26,19 +26,19 @@ public static class MusicController
 
     public static void Pause()
     {
-        try { AudioBackend.Pause(); MelonLogger.Msg("[MusicPlayer] Pausiert."); }
+        try { AudioBackend.Pause(); MelonLogger.Msg("[MusicPlayer] Paused."); }
         catch { }
     }
 
     public static void Resume(float volume)
     {
-        try { AudioBackend.Resume(volume); MelonLogger.Msg("[MusicPlayer] Fortgesetzt."); }
+        try { AudioBackend.Resume(volume); MelonLogger.Msg("[MusicPlayer] Resumed."); }
         catch { }
     }
 
     public static void Stop()
     {
-        try { AudioBackend.Stop(); MelonLogger.Msg("[MusicPlayer] Gestoppt."); }
+        try { AudioBackend.Stop(); MelonLogger.Msg("[MusicPlayer] Stopped."); }
         catch { }
     }
 

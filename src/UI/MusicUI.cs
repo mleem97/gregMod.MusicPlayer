@@ -7,12 +7,12 @@ using greg.Mods.MusicPlayer.Core;
 
 namespace greg.Mods.MusicPlayer.UI;
 
-// UI-Toolkit-Panel auf gregCores Layer-Root + manuelles Klick-Routing.
-// Begruendung: IMGUI ist aus dem IL2CPP-Build weitgehend gestrippt
-// ("Method unstripping failed"), und es existiert kein EventSystem, das
-// Toolkit-Klicks zustellen wuerde. Stattdessen: worldBound-Hit-Test mit
-// Maus-Polling (InputSystem, belegt funktionstuechtig).
-// Kein MonoBehaviour, kein OnGUI, keine Registrierung noetig.
+// UI-Toolkit panel on gregCore's layer root + manual click routing.
+// Reason: IMGUI is largely stripped from the IL2CPP build
+// ("Method unstripping failed"), and there is no EventSystem that would
+// deliver toolkit clicks. Instead: worldBound hit test with
+// mouse polling (InputSystem, proven working).
+// No MonoBehaviour, no OnGUI, no registration needed.
 public static class MusicUI
 {
     private sealed class Clickable
@@ -52,16 +52,16 @@ public static class MusicUI
             bool willShow = !_chrome.IsVisible;
             if (willShow) Rebuild();
             _chrome.Toggle();
-            MelonLogger.Msg("[MusicPlayer] Panel " + (_chrome.IsVisible ? "gezeigt." : "versteckt."));
+            MelonLogger.Msg("[MusicPlayer] Panel " + (_chrome.IsVisible ? "shown." : "hidden."));
             try { if (GregHost.HasCore) ReportOpenState(); } catch { /* best-effort */ }
         }
         catch (Exception ex)
         {
-            MelonLogger.Error("[MusicPlayer] UI-Toggle fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLogger.Error("[MusicPlayer] UI toggle failed: " + ex.GetBaseException().Message);
         }
     }
 
-    // Separate Methode (JIT-Trennung): meldet den Panel-Status ans F1-Hub.
+    // Separate method (JIT separation): reports the panel state to the F1 hub.
     private static void ReportOpenState()
     {
         try { gregCore.UI.GregMenuRegistry.SetOpen("musicplayer", IsVisible); } catch { /* best-effort */ }
@@ -76,7 +76,7 @@ public static class MusicUI
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] UI-Refresh fehlgeschlagen: " + ex.Message);
+            MelonLogger.Warning("[MusicPlayer] UI refresh failed: " + ex.Message);
         }
     }
 
@@ -86,18 +86,18 @@ public static class MusicUI
         try
         {
             if (GregHost.HasCore) CoreToast(message);
-            else ModLocalUI.ShowToast("[Musik] " + message, 5f);
+            else ModLocalUI.ShowToast("[Music] " + message, 5f);
         }
         catch { }
     }
 
     private static void CoreToast(string message)
     {
-        gregCore.UI.GregNotificationManager.Show("[Musik] " + message, 5f);
+        gregCore.UI.GregNotificationManager.Show("[Music] " + message, 5f);
     }
 
-    // Jeden Frame aus Mod.OnUpdate: leitet Mausklicks an sichtbare Buttons
-    // weiter (Ersatz fuers fehlende EventSystem).
+    // Every frame from Mod.OnUpdate: forwards mouse clicks to visible buttons
+    // (replacement for the missing EventSystem).
     public static void RouteClicks()
     {
         if (!IsVisible || _clickables.Count == 0) return;
@@ -107,7 +107,7 @@ public static class MusicUI
             if (mouse == null) return;
             if (!mouse.leftButton.wasPressedThisFrame) return;
             Vector2 pos = mouse.position.ReadValue();
-            // Echte Klicks haben Vorrang: kam vor <500ms einer an, schweigen.
+            // Real clicks take priority: if one arrived <500ms ago, stay silent.
             try
             {
                 if ((DateTime.UtcNow - _lastRealClickUtc).TotalMilliseconds < 500.0) return;
@@ -134,7 +134,7 @@ public static class MusicUI
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] Klick-Routing fehlgeschlagen: " + ex.Message);
+            MelonLogger.Warning("[MusicPlayer] Click routing failed: " + ex.Message);
         }
     }
 
@@ -144,7 +144,7 @@ public static class MusicUI
         catch { return false; }
     }
 
-    // Fortschritt direkt aktualisieren (ohne Rebuild): Text + Fuellstand.
+    // Update progress directly (without rebuild): text + fill level.
     public static void UpdateProgress()
     {
         try
@@ -156,8 +156,8 @@ public static class MusicUI
         catch { }
     }
 
-    // Balken-Ziehlogik: aus Mod.OnUpdate aufrufen. Klick auf Balken springt
-    // sofort, Halten+Ziehen spult (Seek) bzw. regelt (Volume).
+    // Bar drag logic: call from Mod.OnUpdate. Clicking a bar jumps
+    // immediately, hold+drag seeks (Seek) or adjusts (Volume).
     public static void PollBars()
     {
         if (!IsVisible) { _seeking = false; _volSeeking = false; return; }
@@ -325,7 +325,7 @@ public static class MusicUI
 
         if (host)
         {
-            // 1. Steuerungsleiste: Zurueck / Play / Pause / Stop / Weiter.
+            // 1. Control bar: Back / Play / Pause / Stop / Next.
             var row = Row();
             AddIconBtn(row, "prev", () => { try { MusicPlayerMod.PlayPrev(); } catch { } });
             AddIconBtn(row, "play", () => { try { MusicPlayerMod.PlayPressed(); } catch { } });
@@ -334,7 +334,7 @@ public static class MusicUI
             AddIconBtn(row, "next", () => { try { MusicPlayerMod.PlayNext(); } catch { } });
             _content.Add(row);
 
-            // 2. Fortschritt: klick-/ziehbare Seekbar + Zeittext.
+            // 2. Progress: clickable/draggable seek bar + time text.
             _seekBar = Bar(ModTheme.NeutralBorder);
             _seekFill = Fill(ModTheme.PrimaryAccent);
             _seekBar.Add(_seekFill);
@@ -346,7 +346,7 @@ public static class MusicUI
             AddBtn(modeRow, "Clear queue", () => { try { MusicPlayerMod.ClearQueue(); } catch { } }, false);
             _content.Add(modeRow);
 
-            // Lautstaerke: Balken (klick/zieh) + Wert.
+            // Volume: bar (click/drag) + value.
             var volRow = Row();
             var volIcon = IconElement("volume", 24f);
             if (volIcon != null) volRow.Add(volIcon);
@@ -528,8 +528,8 @@ public static class MusicUI
         return l;
     }
 
-    // Toolkit-Default-Font ist im IL2CPP-Build unbrauchbar (Text unsichtbar).
-    // Daher Spiel-Font aus gregCore zuweisen (LegacyRuntime / Game-Font).
+    // The Toolkit default font is unusable in the IL2CPP build (text invisible).
+    // So assign the game font from gregCore (LegacyRuntime / game font).
     private static void ApplyFont()
     {
         Font f = null;
@@ -648,9 +648,9 @@ public static class MusicUI
             ModTheme.ApplySecondaryButtonStyle(btn);
             try { btn.style.color = new Color(0.88f, 0.88f, 0.88f); } catch { }
         }
-        // Echter Toolkit-Callback (funktioniert sobald ein EventSystem aktiv
-        // ist - siehe GregUIInputSystem). Das manuelle Routing bleibt Fallback
-        // und tritt per Zeitstempel zurueck, sobald echte Klicks ankommen.
+        // Real Toolkit callback (works once an EventSystem is active
+        // - see GregUIInputSystem). Manual routing stays as fallback
+        // and yields via timestamp once real clicks arrive.
         try
         {
             btn.RegisterCallback<ClickEvent>(new Action<ClickEvent>(_ =>

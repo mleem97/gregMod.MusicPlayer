@@ -63,7 +63,7 @@ public class MusicPlayerMod : MelonMod
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] GameRootDirectory-Pfad fehlgeschlagen: " + ex.Message);
+            MelonLogger.Warning("[MusicPlayer] GameRootDirectory path failed: " + ex.Message);
         }
         FolderEntry = cat.CreateEntry("MusicFolder", defFolder, "MusicFolder",
             "Folder with music files (.ogg/.wav/.mp3) + optional covers (cover.jpg/png).");
@@ -84,18 +84,18 @@ public class MusicPlayerMod : MelonMod
         }
         catch { }
 
-        MelonLogger.Msg("[MusicPlayer] Musik-Ordner: " + defFolder);
+        MelonLogger.Msg("[MusicPlayer] Music folder: " + defFolder);
         if (!System.IO.Directory.Exists(defFolder))
         {
-            MelonLogger.Warning("[MusicPlayer] Ordner existiert NICHT: " + defFolder);
+            MelonLogger.Warning("[MusicPlayer] Folder does NOT exist: " + defFolder);
             try
             {
                 System.IO.Directory.CreateDirectory(defFolder);
-                MelonLogger.Msg("[MusicPlayer] Ordner erstellt: " + defFolder);
+                MelonLogger.Msg("[MusicPlayer] Folder created: " + defFolder);
             }
             catch (Exception ex)
             {
-                MelonLogger.Error("[MusicPlayer] Konnte Ordner nicht erstellen: " + ex.Message);
+                MelonLogger.Error("[MusicPlayer] Could not create folder: " + ex.Message);
             }
         }
 
@@ -108,9 +108,9 @@ public class MusicPlayerMod : MelonMod
             RegisterHudAndOpener();
             try { CoreSubscribeTrackStarted(); } catch { }
         }
-        MelonLogger.Msg("[MusicPlayer] gregMod.MusicPlayer initialisiert.");
+        MelonLogger.Msg("[MusicPlayer] gregMod.MusicPlayer initialized.");
         if (!GregHost.HasCore)
-            MelonLogger.Msg("[MusicPlayer] Standalone-Modus (ohne gregCore): Basisfunktionen.");
+            MelonLogger.Msg("[MusicPlayer] Standalone mode (without gregCore): basic functions.");
     }
 
     private static void CoreSubscribeTrackStarted()
@@ -127,7 +127,7 @@ public class MusicPlayerMod : MelonMod
         catch { }
     }
 
-    // Settings-Hub (gregCore): zweite Bedienoberflaeche neben F9-Panel.
+    // Settings hub (gregCore): second UI surface next to the F9 panel.
     private static void RegisterSettingsTab()
     {
         try
@@ -150,7 +150,7 @@ public class MusicPlayerMod : MelonMod
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] Settings-Tab fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLogger.Warning("[MusicPlayer] Settings tab failed: " + ex.GetBaseException().Message);
         }
     }
 
@@ -160,7 +160,7 @@ public class MusicPlayerMod : MelonMod
         catch { return false; }
     }
 
-    // Mod-Vertrag: beim Framework anmelden (Name/Version/Menues).
+    // Mod contract: register with the framework (name/version/menus).
     private static void RegisterModContract()
     {
         try
@@ -171,12 +171,12 @@ public class MusicPlayerMod : MelonMod
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] Mod-Registrierung fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLogger.Warning("[MusicPlayer] Mod registration failed: " + ex.GetBaseException().Message);
         }
     }
 
-    // Tasten-HUD (rechter Rand) + Oeffner fuers F1-Hub. Nur mit gregCore
-    // aufrufen (eigene Methode wegen JIT-Trennung ohne gregCore-DLL).
+    // Key HUD (right edge) + opener for the F1 hub. Only call with gregCore
+    // (own method for JIT separation without the gregCore DLL).
     private static void RegisterHudAndOpener()
     {
         try
@@ -188,15 +188,15 @@ public class MusicPlayerMod : MelonMod
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] HUD-Registrierung fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLogger.Warning("[MusicPlayer] HUD registration failed: " + ex.GetBaseException().Message);
         }
     }
 
     public override void OnUpdate()
     {
-        // Klick-Routing fuers Panel (Fallback falls kein EventSystem zustellt).
+        // Click routing for the panel (fallback when no EventSystem delivers).
         try { UI.MusicUI.RouteClicks(); } catch { }
-        // Balken-Ziehen (Seek/Volume).
+        // Bar dragging (seek/volume).
         try { UI.MusicUI.PollBars(); } catch { }
 
         try
@@ -230,16 +230,16 @@ public class MusicPlayerMod : MelonMod
             AdvanceQueue();
         }
 
-        // Crossfade ticken.
+        // Tick crossfade.
         try { MusicController.TickFade(Time.deltaTime); } catch { }
 
-        // Fortschritt ca. 2x/Sekunde aktualisieren (nur bei offenem Panel).
+        // Update progress ~2x/second (only when the panel is open).
         _progressTimer += Time.deltaTime;
         if (_progressTimer > 0.5f)
         {
             _progressTimer = 0f;
             try { UI.MusicUI.UpdateProgress(); } catch { }
-            // 30s vor Ende: Folgetitel vorladen (Queue hat Vorrang).
+            // 30s before the end: preload next track (queue takes priority).
             try { PreloadAhead(); } catch { }
         }
     }
@@ -266,8 +266,8 @@ public class MusicPlayerMod : MelonMod
         UI.MusicUI.Refresh();
     }
 
-    // Bibliothek: Titel sofort spielen. Ist er in der Queue, dorthin springen,
-    // sonst als Naechstes einreihen und anspringen.
+    // Library: play title immediately. If it is in the queue, jump there,
+    // otherwise enqueue next and jump to it.
     public static void PlayIndex(int i)
     {
         if (_tracks.Count == 0) return;
@@ -287,7 +287,7 @@ public class MusicPlayerMod : MelonMod
         PlayQueued(track);
     }
 
-    // Transport: Weiter (manuell) / Zurueck.
+    // Transport: next (manual) / previous.
     public static void PlayNext()
     {
         EnsureQueueFilled();
@@ -308,14 +308,14 @@ public class MusicPlayerMod : MelonMod
         PlayQueued(prev);
     }
 
-    // Play/Pause-Hauptschalter (Umschalter).
+    // Play/pause master switch (toggle).
     public static void PlayToggle()
     {
         if (MusicController.IsPlayingNow) { Pause(); return; }
         PlayPressed();
     }
 
-    // Explizit Play: fortsetzen oder starten, niemals pausieren.
+    // Explicit play: resume or start, never pause.
     public static void PlayPressed()
     {
         if (MusicController.IsPlayingNow) return;
@@ -332,7 +332,7 @@ public class MusicPlayerMod : MelonMod
         PlayQueued(cur);
     }
 
-    // Explizit Stopp.
+    // Explicit stop.
     public static void Stop()
     {
         MusicController.Stop();
@@ -355,7 +355,7 @@ public class MusicPlayerMod : MelonMod
         catch { }
     }
 
-    // Titelende erreicht -> je nach Modus weiter oder stoppen.
+    // Track end reached -> continue or stop depending on mode.
     private static void AdvanceQueue()
     {
         if (Queue.Count == 0) return;
@@ -380,11 +380,11 @@ public class MusicPlayerMod : MelonMod
         UI.MusicUI.Refresh();
         if (ReadSyncFlag() && MusicSync.IsHost())
             MusicSync.Publish(track.Title, "playing");
-        // Folge direkt anstoßen (fuer kurze Tracks reicht die 30s-Regel nicht).
+        // Trigger follow-up directly (the 30s rule is not enough for short tracks).
         try { PreloadAhead(); } catch { }
     }
 
-    // Naechsten Titel bestimmen (ohne zu schalten) und vorladen, falls noetig.
+    // Determine next track (without switching) and preload if needed.
     private static void PreloadAhead()
     {
         try
@@ -392,15 +392,15 @@ public class MusicPlayerMod : MelonMod
             if (!MusicSync.IsHost()) return;
             if (!MusicController.IsPlayingNow) return;
             float remaining = MusicController.RemainingSeconds();
-            // Nur im letzten Drittel bzw. <30s, und nicht dauerhaft pollen:
-            // PreloadTrack ist idempotent (Cache/laufend -> no-op).
+            // Only in the last third or <30s, and do not poll permanently:
+            // PreloadTrack is idempotent (cache/running -> no-op).
             if (remaining >= 0f && remaining < 30f)
             {
                 var next = Queue.PeekNext(PlayMode);
                 if (next == null) return;
                 if (MusicController.IsCached(next.FilePath)) return;
                 if (MusicController.IsPreloading(next.FilePath)) return;
-                // Gleicher Titel (RepeatOne) ist bereits im Cache.
+                // Same track (RepeatOne) is already cached.
                 if (Queue.Current != null && string.Equals(Queue.Current.FilePath, next.FilePath,
                         StringComparison.OrdinalIgnoreCase)) return;
                 MusicController.PreloadTrack(next);
@@ -409,8 +409,8 @@ public class MusicPlayerMod : MelonMod
         catch { }
     }
 
-    // FIFA/NFSU-Stil: "NOW PLAYING" klein, TITEL fett gross, Kuenstler kleiner.
-    // Dazu Cover aus ID3 (Fallback: note-Icon). Text sanitiert (Emoji-frei).
+    // FIFA/NFSU style: "NOW PLAYING" small, TITLE bold large, artist smaller.
+    // Plus cover from ID3 (fallback: note icon). Text sanitized (emoji-free).
     private static void CoreNowPlaying(string title, string artist, MusicTrack track)
     {
         UnityEngine.Texture2D cover = null;
@@ -467,7 +467,7 @@ public class MusicPlayerMod : MelonMod
         catch { }
     }
 
-    // --- Queue-Verwaltung (UI) ---
+    // --- Queue management (UI) ---
 
     public static void EnqueueTrack(int libraryIndex)
     {
@@ -549,7 +549,7 @@ public class MusicPlayerMod : MelonMod
                 }
             }
             if (Queue.Count > 0)
-                MelonLogger.Msg($"[MusicPlayer] Warteschlange wiederhergestellt: {Queue.Count} Titel.");
+                MelonLogger.Msg($"[MusicPlayer] Queue restored: {Queue.Count} tracks.");
         }
         catch { }
     }
@@ -589,7 +589,7 @@ public class MusicPlayerMod : MelonMod
                 }
                 else
                 {
-                    UI.MusicUI.PushToast("Sync: '" + track + "' fehlt lokal.");
+                    UI.MusicUI.PushToast("Sync: '" + track + "' missing locally.");
                 }
             }
             if (state == "paused" && MusicController.IsPlayingNow) MusicController.Pause();

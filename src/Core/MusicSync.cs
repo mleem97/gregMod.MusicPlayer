@@ -2,10 +2,10 @@ using MelonLoader;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Song-Status-Sync ueber Steam-Lobby-Daten (sicherer Seitenkanal -
-// das Spiel-Owned-Netz (NetMsg/Chunking) wird NICHT angefasst).
-// Host schreibt Titel+Status, Clients pollen und folgen. Dateiname ist
-// der Schlüssel: Jeder Client spielt seine lokale Kopie aus eigenem Ordner.
+// Song status sync via Steam lobby data (safe side channel -
+// the game-owned network (NetMsg/chunking) is NOT touched).
+// Host writes title+status, clients poll and follow. The file name is
+// the key: each client plays its local copy from its own folder.
 public static class MusicSync
 {
     public const string KeyTrack = "greg.music.track";
@@ -37,7 +37,7 @@ public static class MusicSync
 
     public static bool IsHost()
     {
-        // Standalone: immer Host (Solo-Verhalten).
+        // Standalone: always host (solo behavior).
         try { return GregHost.HasCore ? HostCanMutate() : true; }
         catch { return true; }
     }
@@ -58,11 +58,11 @@ public static class MusicSync
         }
         catch (System.Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] Sync-Publish fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLogger.Warning("[MusicPlayer] Sync publish failed: " + ex.GetBaseException().Message);
         }
     }
 
-    // Client-Tick: Lobby lesen, bei Abweichung folgen. Rueckgabe: (track, state).
+    // Client tick: read lobby, follow on mismatch. Returns: (track, state).
     public static bool Poll(float dt, out string track, out string state)
     {
         track = "";

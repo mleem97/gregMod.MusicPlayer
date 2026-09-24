@@ -6,9 +6,9 @@ using UnityEngine.Networking;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Standalone-Wiedergabe (ohne gregCore): Basisfunktionen ohne Cache,
-// Crossfade und Preload. Download + WAV/MP3-Decode + eine AudioSource.
-// Alle Typen sind mod-lokal, Unity oder NuGet (JIT-sicher ohne DLL).
+// Standalone playback (without gregCore): basic functions without cache,
+// crossfade and preload. Download + WAV/MP3 decode + one AudioSource.
+// All types are mod-local, Unity or NuGet (JIT-safe without DLL).
 public static class ModLocalAudio
 {
     private static GameObject _obj;
@@ -53,7 +53,7 @@ public static class ModLocalAudio
         {
             var src = Source();
             if (src == null) return;
-            MelonLogger.Msg("[MusicPlayer] Lade (standalone): '" + title + "'");
+            MelonLogger.Msg("[MusicPlayer] Loading (standalone): '" + title + "'");
             MelonCoroutines.Start(LoadAndPlay(filePath, title, volume));
         }
         catch (Exception ex)
@@ -117,7 +117,7 @@ public static class ModLocalAudio
         catch { }
     }
 
-    // True genau an der Ende-Flanke.
+    // True exactly on the end edge.
     public static bool PollEnded()
     {
         try
@@ -225,7 +225,7 @@ public static class ModLocalAudio
                 else
                 {
                     try { data = req.downloadHandler != null ? req.downloadHandler.data : null; } catch { }
-                    if (data == null || data.Length == 0) fail = "Leer";
+                    if (data == null || data.Length == 0) fail = "Empty";
                 }
             }
             catch (Exception ex) { fail = "Download: " + ex.GetBaseException().Message; }
@@ -244,7 +244,7 @@ public static class ModLocalAudio
             if (!LocalAudioDecoder.TryDecode(filePath, data, out samples, out channels, out frequency)
                 || samples == null || samples.Length == 0 || channels <= 0 || frequency <= 0)
             {
-                MelonLogger.Warning("[MusicPlayer] Dekodieren fehlgeschlagen (" + title + ")");
+                MelonLogger.Warning("[MusicPlayer] Decode failed (" + title + ")");
                 yield break;
             }
         }
@@ -261,7 +261,7 @@ public static class ModLocalAudio
             clip = AudioClip.Create(title, frames, channels, frequency, false);
             if (clip == null || !clip.SetData(samples, 0))
             {
-                MelonLogger.Warning("[MusicPlayer] Clip-Erstellung fehlgeschlagen (" + title + ")");
+                MelonLogger.Warning("[MusicPlayer] Clip creation failed (" + title + ")");
                 try { if (clip != null) UnityEngine.Object.Destroy(clip); } catch { }
                 yield break;
             }
@@ -293,11 +293,11 @@ public static class ModLocalAudio
             src.loop = false;
             src.Play();
             _wasPlaying = true;
-            MelonLogger.Msg("[MusicPlayer] Spielt: '" + title + "' (" + clip.length.ToString("F1") + "s)");
+            MelonLogger.Msg("[MusicPlayer] Playing: '" + title + "' (" + clip.length.ToString("F1") + "s)");
         }
         catch (Exception ex)
         {
-            MelonLogger.Error("[MusicPlayer] Abspielen: " + ex.GetBaseException().Message);
+            MelonLogger.Error("[MusicPlayer] Playback: " + ex.GetBaseException().Message);
         }
     }
 }

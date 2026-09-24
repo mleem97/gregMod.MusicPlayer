@@ -9,7 +9,7 @@ public sealed class MusicTrack
     public string Title { get; }
     public string CoverPath { get; }
 
-    // ID3-Metadaten (TagLibSharp), beim Scan befuellt wo vorhanden.
+    // ID3 metadata (TagLibSharp), filled during scan where available.
     public string Id3Title { get; internal set; }
     public string Id3Artist { get; internal set; }
     public string Id3Album { get; internal set; }
@@ -24,10 +24,10 @@ public sealed class MusicTrack
         CoverPath = coverPath;
     }
 
-    // Anzeigetitel: ID3-Titel bevorzugt, sonst Dateiname.
+    // Display title: prefer ID3 title, else file name.
     public string DisplayTitle => string.IsNullOrWhiteSpace(Id3Title) ? Title : Id3Title;
 
-    // Cover-Textur (ID3-eingebettet bevorzugt, sonst Datei-Cover). Lazy, cached.
+    // Cover texture (prefer ID3-embedded, else file cover). Lazy, cached.
     public UnityEngine.Texture2D CoverTexture
     {
         get
@@ -80,7 +80,7 @@ public static class MusicLibrary
                 if (!_loggedMissingFolder)
                 {
                     _loggedMissingFolder = true;
-                    MelonLoader.MelonLogger.Warning("[MusicPlayer] Musik-Ordner nicht vorhanden: " + folder);
+                    MelonLoader.MelonLogger.Warning("[MusicPlayer] Music folder missing: " + folder);
                 }
                 return tracks;
             }
@@ -103,13 +103,13 @@ public static class MusicLibrary
         }
         catch (System.Exception ex)
         {
-            MelonLoader.MelonLogger.Warning("[MusicPlayer] Scan fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLoader.MelonLogger.Warning("[MusicPlayer] Scan failed: " + ex.GetBaseException().Message);
         }
         return tracks;
     }
 
-    // ID3-Tags lesen (Titel/Kuenstler/Album/Cover). Niemals brechen lassen:
-    // pro Datei abgesichert, Fehler nur einmalig loggen.
+    // Read ID3 tags (title/artist/album/cover). Never let it throw:
+    // guarded per file, log errors only once.
     private static bool _loggedId3;
     private static void ReadId3(MusicTrack track)
     {
@@ -117,7 +117,7 @@ public static class MusicLibrary
         try
         {
             string ext = Path.GetExtension(track.FilePath).ToLowerInvariant();
-            if (ext != ".mp3") return; // TagLib nur wo Tags zu erwarten sind
+            if (ext != ".mp3") return; // TagLib only where tags are expected
             using (var file = TagLib.File.Create(track.FilePath))
             {
                 if (file == null || file.Tag == null) return;
@@ -155,7 +155,7 @@ public static class MusicLibrary
             if (!_loggedId3)
             {
                 _loggedId3 = true;
-                MelonLoader.MelonLogger.Warning("[MusicPlayer] ID3-Lesen fehlgeschlagen (einmalig): " + ex.GetBaseException().Message);
+                MelonLoader.MelonLogger.Warning("[MusicPlayer] ID3 read failed (once): " + ex.GetBaseException().Message);
             }
         }
     }

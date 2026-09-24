@@ -7,9 +7,9 @@ using greg.Mods.MusicPlayer.Core;
 
 namespace greg.Mods.MusicPlayer.UI;
 
-// Standalone-UI-Schicht (ohne gregCore): eigene UIDocument, Toasts,
-// Input-Guard, Font. Wird nur benutzt wenn GregHost.HasCore == false.
-// Alle Methoden sind frei von gregCore-Typen (JIT-sicher).
+// Standalone UI layer (without gregCore): own UIDocument, toasts,
+// input guard, font. Only used when GregHost.HasCore == false.
+// All methods are free of gregCore types (JIT-safe).
 public static class ModLocalUI
 {
     private sealed class Toast
@@ -51,7 +51,7 @@ public static class ModLocalUI
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] Layer-Aufbau fehlgeschlagen: " + ex.Message);
+            MelonLogger.Warning("[MusicPlayer] Layer setup failed: " + ex.Message);
             return null;
         }
     }
@@ -109,7 +109,7 @@ public static class ModLocalUI
         catch { }
     }
 
-    // Input-Guard: true = sperren (Panel offen), false = freigeben.
+    // Input guard: true = lock (panel open), false = release.
     public static void SetLocked(bool locked)
     {
         _wantLock = locked;
@@ -118,7 +118,7 @@ public static class ModLocalUI
 
     public static void Tick()
     {
-        // Toasts altern lassen
+        // Age out toasts
         try
         {
             if (_toasts.Count > 0)

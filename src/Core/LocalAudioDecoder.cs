@@ -5,10 +5,10 @@ using MelonLoader;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Managed Audio-Dekodierung: UnityWebRequest-Audio ist aus dem IL2CPP-Build
-// gestrippt, daher dekodieren wir selbst nach float-PCM (interleaved).
-// Formate: WAV (PCM 8/16/24/32 + IEEE-Float, manuell), MP3 (NLayer, managed).
-// OGG derzeit nicht unterstuetzt (klare Warnung statt Absturz).
+// Managed audio decoding: UnityWebRequest audio is stripped from the IL2CPP build,
+// so we decode ourselves to float PCM (interleaved).
+// Formats: WAV (PCM 8/16/24/32 + IEEE float, manual), MP3 (NLayer, managed).
+// OGG currently not supported (clear warning instead of a crash).
 public static class LocalAudioDecoder
 {
     public static bool TryDecode(string filePath, byte[] data, out float[] samples, out int channels, out int frequency)
@@ -22,12 +22,12 @@ public static class LocalAudioDecoder
             string ext = Path.GetExtension(filePath).ToLowerInvariant();
             if (ext == ".wav" || ext == ".wave") return TryDecodeWav(data, out samples, out channels, out frequency);
             if (ext == ".mp3") return TryDecodeMp3(data, out samples, out channels, out frequency);
-            MelonLogger.Warning("[MusicPlayer] Format nicht unterstuetzt (nur .wav/.mp3): " + ext);
+            MelonLogger.Warning("[MusicPlayer] Format not supported (only .wav/.mp3): " + ext);
             return false;
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] Decode-Ausnahme: " + ex.GetBaseException().Message);
+            MelonLogger.Warning("[MusicPlayer] Decode exception: " + ex.GetBaseException().Message);
             return false;
         }
     }
@@ -72,7 +72,7 @@ public static class LocalAudioDecoder
             }
 
             if (dataOff < 0 || fmtChannels <= 0 || fmtRate <= 0) return false;
-            if (fmtAudio != 1 && fmtAudio != 3) return false; // nur PCM + IEEE-Float
+            if (fmtAudio != 1 && fmtAudio != 3) return false; // PCM + IEEE float only
             if (fmtAudio == 3 && fmtBits != 32) return false;
 
             int bytesPerSample = fmtBits / 8;
@@ -120,12 +120,12 @@ public static class LocalAudioDecoder
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] WAV-Decode fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLogger.Warning("[MusicPlayer] WAV decode failed: " + ex.GetBaseException().Message);
             return false;
         }
     }
 
-    // --- MP3 (NLayer, rein managed) ---
+    // --- MP3 (NLayer, fully managed) ---
     private static bool TryDecodeMp3(byte[] data, out float[] samples, out int channels, out int frequency)
     {
         samples = null;
@@ -159,7 +159,7 @@ public static class LocalAudioDecoder
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] MP3-Decode fehlgeschlagen: " + ex.GetBaseException().Message);
+            MelonLogger.Warning("[MusicPlayer] MP3 decode failed: " + ex.GetBaseException().Message);
             return false;
         }
     }
