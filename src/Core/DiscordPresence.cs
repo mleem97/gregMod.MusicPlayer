@@ -5,10 +5,10 @@ using gregCore.Infrastructure.Social;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Discord Rich Presence fuer den MusicPlayer (Englisch).
-// Pro Titel: zufaellige Details-Phrase + State-Zeile mit {ARTIST}/{ALBUM}/
-// {TITLE}. Texte sanitiert (Emoji-frei). Sprach-Assets bleiben beim
-// Framework-Default (Custom-Cover brauchen Discord-seitige Uploads).
+// Discord Rich Presence for MusicPlayer (English).
+// Per track: random details phrase + state line with {ARTIST}/{ALBUM}/
+// {TITLE}. Texts sanitized (emoji-free). Voice assets stay at
+// framework default (custom covers need Discord-side uploads).
 public static class DiscordPresence
 {
     private static readonly Random Rng = new Random();
@@ -83,7 +83,7 @@ public static class DiscordPresence
         }
         catch (Exception ex)
         {
-            MelonLogger.Warning("[MusicPlayer] Discord-Presence fehlgeschlagen: " + ex.Message);
+            MelonLogger.Warning("[MusicPlayer] Discord presence failed: " + ex.Message);
         }
     }
 

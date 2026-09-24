@@ -2,12 +2,12 @@ using System;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Erkennt zur Laufzeit, ob gregCore vorhanden ist (ohne harte Abhaengigkeit
-// zur Laufzeit: reiner Typname-Lookup, kein direkter Typzugriff).
-// Mit Core: optimierte zentrale Services. Ohne: mod-lokale Minimal-
-// implementationen (Standalone-Modus, nur Basisfunktionen).
-// WICHTIG: Methoden, die gregCore-Typen beruehren, duerfen NUR aufgerufen
-// werden, wenn HasCore true ist (sonst JIT-TypeLoad bei fehlender DLL).
+// Detects at runtime whether gregCore is present (no hard dependency
+// at runtime: type-name lookup only, no direct type access).
+// With core: optimized central services. Without: mod-local minimal
+// implementations (standalone mode, base features only).
+// IMPORTANT: methods touching gregCore types must ONLY be called
+// if HasCore is true (else JIT TypeLoad without DLL).
 public static class GregHost
 {
     private const string ProbeType = "gregCore.UI.GregNotificationManager, gregCore";
@@ -26,7 +26,7 @@ public static class GregHost
         }
     }
 
-    // Nur zu Testzwecken (z.B. Standalone-Verhalten erzwingen).
+    // Testing only (e.g. force standalone behavior).
     public static void OverrideForTesting(bool? value)
     {
         _hasCore = value;

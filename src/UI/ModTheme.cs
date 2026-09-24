@@ -3,14 +3,14 @@ using UnityEngine.UIElements;
 
 namespace greg.Mods.MusicPlayer.UI;
 
-// Mod-lokaler Mirror von GregUITheme (Himmelblau/Atollblau, modern minimal).
-// Absichtlich entkoppelt: funktioniert MIT und OHNE gregCore identisch.
-// Bei Theme-Aenderungen in gregCore hier nachziehen.
+// Mod-local mirror of GregUITheme (sky/atoll blue, modern minimal).
+// Deliberately decoupled: works identically WITH and WITHOUT gregCore.
+// Mirror theme changes from gregCore here.
 public static class ModTheme
 {
-    public static readonly Color PrimaryAccent = ParseHex("#0AA2C0"); // Atollblau (CTA)
-    public static readonly Color PrimaryTextOnAccent = ParseHex("#06121F"); // Dunkelnavy auf Atoll
-    public static readonly Color SecondaryColor = ParseHex("#87CEEB"); // Himmelblau (Highlights)
+    public static readonly Color PrimaryAccent = ParseHex("#0AA2C0"); // Atoll blue (CTA)
+    public static readonly Color PrimaryTextOnAccent = ParseHex("#06121F"); // Dark navy on atoll
+    public static readonly Color SecondaryColor = ParseHex("#87CEEB"); // Sky blue (highlights)
     public static readonly Color TertiaryColor = new Color(1.00f, 0.85f, 0.28f); // Gold
     public static readonly Color NeutralBorder = new Color(0.14f, 0.17f, 0.22f, 0.80f);
     public static readonly Color BackgroundDark = new Color(0.06f, 0.08f, 0.11f, 0.96f);

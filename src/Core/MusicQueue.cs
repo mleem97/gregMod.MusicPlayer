@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Wiedergabemodi: Aus = Queue einmal durch, dann Stopp. Alle = Endlosschleife
-// ueber die Queue. Eins = aktueller Titel wiederholt. Zufall = gemischt.
+// Play modes: Off = queue once through, then stop. All = endless loop
+// over queue. One = repeat current track. Shuffle = mixed.
 public enum RepeatMode
 {
     Off = 0,
@@ -13,8 +13,8 @@ public enum RepeatMode
     Shuffle = 3,
 }
 
-// Geordnete Warteschlange. Reine Entscheidungslogik (außer Random-Quelle),
-// kein Unity-/Il2Cpp-Zugriff.
+// Ordered queue. Pure decision logic (except random source),
+// no Unity/Il2Cpp access.
 public sealed class MusicQueue
 {
     private readonly List<MusicTrack> _items = new List<MusicTrack>();
@@ -89,8 +89,8 @@ public sealed class MusicQueue
         return _items[index];
     }
 
-    // Naechster Titel nach Modus. manual=true: Benutzer hat Weiter gedrueckt
-    // (Eins faellt dann auf Weiter zurueck). Rueckgabe null = Stopp.
+    // Next track per mode. manual=true: user pressed next
+    // (One then falls back to next). Return null = stop.
     public MusicTrack Advance(RepeatMode mode, bool manual)
     {
         if (_items.Count == 0) return null;
@@ -126,7 +126,7 @@ public sealed class MusicQueue
         return _items[Position];
     }
 
-    // Folgetitel nach Modus OHNE Positionsaenderung (fuer Preload).
+    // Next track per mode WITHOUT position change (for preload).
     public MusicTrack PeekNext(RepeatMode mode)
     {
         if (_items.Count == 0) return null;
@@ -153,7 +153,7 @@ public sealed class MusicQueue
         return _items[target];
     }
 
-    // Vorheriger Titel (nur manuell): eine Position zurueck, stoppt bei 0.
+    // Previous track (manual only): one position back, stops at 0.
     public MusicTrack StepBack()
     {
         if (_items.Count == 0) return null;

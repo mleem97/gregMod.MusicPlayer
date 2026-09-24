@@ -3,10 +3,10 @@ using MelonLoader;
 
 namespace greg.Mods.MusicPlayer.Core;
 
-// Audio-Dispatch: mit gregCore -> GregAudioService (Cache, Crossfade,
-// Preload, optimiert). Ohne -> ModLocalAudio (Basisfunktionen).
-// Dispatcher-Methoden beruehren NUR mod-lokale Typen (JIT-sicher ohne DLL);
-// Core-Pfade liegen in separaten Methoden und laufen nur bei HasCore.
+// Audio dispatch: with gregCore -> GregAudioService (cache, crossfade,
+// preload, optimized). Without -> ModLocalAudio (base features).
+// Dispatcher methods touch ONLY mod-local types (JIT-safe without DLL);
+// core paths live in separate methods and run only with HasCore.
 public static class AudioBackend
 {
     public static string CurrentTitle
@@ -166,12 +166,12 @@ public static class AudioBackend
         try
         {
             if (GregHost.HasCore) CorePreload(track);
-            // Standalone: kein Preload (Basisfunktion).
+            // Standalone: no preload (base feature).
         }
         catch { }
     }
 
-    // --- Core-Pfad (nur bei vorhandener DLL aufgerufen!) ---
+    // --- Core path (called only with DLL present!) ---
     private static string CoreTitle() => gregCore.PublicApi.Audio.GregAudioService.CurrentTitle;
     private static bool CoreIsPlaying() => gregCore.PublicApi.Audio.GregAudioService.IsPlaying;
     private static void CorePlay(MusicTrack t, float v) => gregCore.PublicApi.Audio.GregAudioService.PlayFile(t.FilePath, t.Title, v);
