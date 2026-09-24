@@ -5,7 +5,7 @@ using UnityEngine;
 using greg.Mods.MusicPlayer.Core;
 using gregCore.PublicApi.Audio;
 
-[assembly: MelonInfo(typeof(greg.Mods.MusicPlayer.MusicPlayerMod), "gregMod.MusicPlayer", "1.0.0", "teamGreg")]
+[assembly: MelonInfo(typeof(greg.Mods.MusicPlayer.MusicPlayerMod), "gregMod.MusicPlayer", "1.1.0", "teamGreg")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace greg.Mods.MusicPlayer;
@@ -166,7 +166,7 @@ public class MusicPlayerMod : MelonMod
         try
         {
             gregCore.Core.Mods.GregModRegistry.Register(
-                "gregMod.MusicPlayer", "MusicPlayer", "1.0.0",
+                "gregMod.MusicPlayer", "MusicPlayer", "1.1.0",
                 new string[] { "musicplayer" });
         }
         catch (Exception ex)
@@ -182,9 +182,8 @@ public class MusicPlayerMod : MelonMod
         try
         {
             gregCore.UI.GregHudRegistry.Register("musicplayer", _toggleKey.ToString(), "Music");
-            gregCore.UI.GregMenuRegistry.RegisterOpener("musicplayer", () => UI.MusicUI.Toggle());
-            gregCore.UI.GregMenuRegistry.RegisterCloser("musicplayer",
-                () => { try { if (UI.MusicUI.IsVisible) UI.MusicUI.Toggle(); } catch { /* best-effort */ } });
+            gregCore.UI.GregMenuBinding.BindToggle("musicplayer",
+                UI.MusicUI.Toggle, () => UI.MusicUI.IsVisible);
         }
         catch (Exception ex)
         {
