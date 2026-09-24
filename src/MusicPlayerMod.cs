@@ -5,7 +5,7 @@ using UnityEngine;
 using greg.Mods.MusicPlayer.Core;
 using gregCore.PublicApi.Audio;
 
-[assembly: MelonInfo(typeof(greg.Mods.MusicPlayer.MusicPlayerMod), "gregMod.MusicPlayer", "1.1.0", "teamGreg")]
+[assembly: MelonInfo(typeof(greg.Mods.MusicPlayer.MusicPlayerMod), "gregMod.MusicPlayer", "1.1.1", "teamGreg")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace greg.Mods.MusicPlayer;
@@ -166,7 +166,7 @@ public class MusicPlayerMod : MelonMod
         try
         {
             gregCore.Core.Mods.GregModRegistry.Register(
-                "gregMod.MusicPlayer", "MusicPlayer", "1.1.0",
+                "gregMod.MusicPlayer", "MusicPlayer", "1.1.1",
                 new string[] { "musicplayer" });
         }
         catch (Exception ex)
